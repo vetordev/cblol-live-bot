@@ -11,24 +11,25 @@ type Bot struct {
 	bot *tgbot.BotAPI
 }
 
+func (b *Bot) Reply(chatId int64, messageId int, text string) {
+
+	msg := tgbot.NewMessage(chatId, text)
+	msg.ReplyToMessageID = messageId
+
+	if _, err := b.bot.Send(msg); err != nil {
+		fmt.Printf("could not send message: %s", err.Error())
+	}
+}
+
 func (b *Bot) handleUpdate(update tgbot.Update) {
 	if update.Message == nil {
 		return
 	}
 
-	var response string
+	command := newCommand(update.Message)
+	response := command.exec()
 
-	switch update.Message.Text {
-	default:
-		response = "Oops! Comando inválido"
-	}
-
-	msg := tgbot.NewMessage(update.Message.Chat.ID, response)
-	msg.ReplyToMessageID = update.Message.MessageID
-
-	if _, err := b.bot.Send(msg); err != nil {
-		fmt.Printf("could not send message: %s", err.Error())
-	}
+	b.Reply(update.Message.Chat.ID, update.Message.MessageID, response)
 }
 
 func (b *Bot) Run() {
