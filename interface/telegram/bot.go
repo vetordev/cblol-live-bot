@@ -27,7 +27,7 @@ func (b *Bot) handleUpdate(update tgbot.Update) {
 	msg.ReplyToMessageID = update.Message.MessageID
 
 	if _, err := b.bot.Send(msg); err != nil {
-		fmt.Printf("Cannot send message: %s", err.Error())
+		fmt.Printf("could not send message: %s", err.Error())
 	}
 }
 
