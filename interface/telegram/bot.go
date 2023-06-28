@@ -16,15 +16,18 @@ func (b *Bot) handleUpdate(update tgbot.Update) {
 		return
 	}
 
-	fmt.Println(update.UpdateID)
-	msg := tgbot.NewMessage(update.Message.Chat.ID, update.Message.Text)
+	var response string
+
+	switch update.Message.Text {
+	default:
+		response = "Oops! Comando inválido"
+	}
+
+	msg := tgbot.NewMessage(update.Message.Chat.ID, response)
 	msg.ReplyToMessageID = update.Message.MessageID
 
 	if _, err := b.bot.Send(msg); err != nil {
-		// Note that panics are a bad way to handle errors. Telegram can
-		// have service outages or network errors, you should retry sending
-		// messages or more gracefully handle failures.
-		panic(err)
+		fmt.Printf("Cannot send message: %s", err.Error())
 	}
 }
 
