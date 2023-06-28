@@ -1,20 +1,27 @@
 package telegrambot
 
-import tgbot "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+import (
+	"cblol-bot/application/ranking"
+	"log"
+	"os"
+)
 
 const InvalidCommand = "Oops! Comando inválido."
 
 type Command struct {
-	message *tgbot.Message
+	command   string
+	arguments string
+
+	rankingApplication *rankingapp.Application
 }
 
 func (c *Command) exec() string {
 
 	var response string
 
-	switch c.message.Command() {
+	switch c.command {
 	case "ranking":
-		response = "ranking: "
+		response = c.rankingApplication.GetRanking()
 		break
 	default:
 		response = InvalidCommand
@@ -23,6 +30,20 @@ func (c *Command) exec() string {
 	return response
 }
 
-func newCommand(message *tgbot.Message) *Command {
-	return &Command{message}
+func NewCommand(command string, arguments string) *Command {
+	lolApiKey := os.Getenv("LOL_API_KEY")
+
+	if lolApiKey == "" {
+		log.Fatal("LOL_API_KEY is empty")
+	}
+
+	lang := os.Getenv("LOL_API_LANG")
+
+	if lolApiKey == "" {
+		log.Fatal("LOL_API_LANG is empty")
+	}
+
+	rankingApplication := rankingapp.New(lolApiKey, lang)
+
+	return &Command{command, arguments, rankingApplication}
 }
