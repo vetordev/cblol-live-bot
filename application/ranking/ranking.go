@@ -1,6 +1,8 @@
 package rankingapp
 
 import (
+	rankingmodel "cblol-bot/domain/model/ranking"
+	teammodel "cblol-bot/domain/model/team"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -40,8 +42,6 @@ func (a *Application) GetRanking() string {
 		return CouldNotGetRankings
 	}
 
-	fmt.Println(string(body))
-
 	var standingsData StandingsDataDto
 	err = json.Unmarshal(body, &standingsData)
 
@@ -49,8 +49,19 @@ func (a *Application) GetRanking() string {
 		fmt.Println(err)
 		return CouldNotGetRankings
 	}
-	fmt.Println(standingsData)
-	return "OK!"
+
+	rankingsDto := standingsData.Data.Standings[0].Stages[0].Sections[0].Rankings
+
+	var teams []*teammodel.Team
+
+	for _, rankingDto := range rankingsDto {
+		teamDto := rankingDto.Teams[0]
+		teams = append(teams, teammodel.New(teamDto.Name, teamDto.Record.Wins, teamDto.Record.Losses))
+	}
+
+	ranking := rankingmodel.New(teams)
+
+	return ranking.FormatToString()
 }
 
 func New(apiKey string, lang string) *Application {

@@ -23,5 +23,9 @@ type RankingDto struct {
 }
 
 type TeamDto struct {
-	Name string `json:"name"`
+	Name   string `json:"name"`
+	Record struct {
+		Wins   int `json:"wins"`
+		Losses int `json:"losses"`
+	} `json:"record"`
 }
