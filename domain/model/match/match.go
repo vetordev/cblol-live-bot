@@ -13,21 +13,16 @@ const (
 )
 
 type Match struct {
-	schedule time.Time
-	state    State
+	Schedule *time.Time
+	Week     int
+	State    State
 
-	team1 team.Team
-	team2 team.Team
+	Team1 *team.Team
+	Team2 *team.Team
+
+	Winner *team.Team
 }
 
-func (m *Match) Winner() *team.Team {
-	return nil
-}
-
-func (m *Match) Loser() *team.Team {
-	return nil
-}
-
-func New(schedule time.Time, state State, team1 team.Team, team2 team.Team) *Match {
-	return &Match{schedule, state, team1, team2}
+func New(schedule *time.Time, week int, state State, team1 *team.Team, team2 *team.Team, winner *team.Team) *Match {
+	return &Match{schedule, week, state, team1, team2, winner}
 }
