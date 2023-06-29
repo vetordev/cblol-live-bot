@@ -1,9 +1,10 @@
 package main
 
 import (
-	telegrambot "cblol-bot/interface/telegram"
+	"fmt"
 	"github.com/joho/godotenv"
 	"log"
+	"time"
 )
 
 func loadEnv() {
@@ -16,7 +17,13 @@ func loadEnv() {
 func main() {
 	loadEnv()
 
-	bot := telegrambot.New(true)
+	matchTime, err := time.Parse(time.RFC3339, "2023-07-08T16:00:00Z")
+	location, err := time.LoadLocation("America/Sao_Paulo")
+	matchTime = time.Date(matchTime.Year(), matchTime.Month(), matchTime.Day(), 0, 0, 0, 0, location)
+	now := time.Now()
 
-	bot.Run()
+	fmt.Println(matchTime, err, matchTime.After(now))
+	//bot := telegrambot.New(true)
+	//
+	//bot.Run()
 }

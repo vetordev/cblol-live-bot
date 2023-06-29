@@ -20,6 +20,14 @@ type Match struct {
 	team2 team.Team
 }
 
+func (m *Match) Winner() *team.Team {
+	return nil
+}
+
+func (m *Match) Loser() *team.Team {
+	return nil
+}
+
 func New(schedule time.Time, state State, team1 team.Team, team2 team.Team) *Match {
 	return &Match{schedule, state, team1, team2}
 }
