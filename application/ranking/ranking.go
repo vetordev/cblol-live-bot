@@ -9,8 +9,10 @@ import (
 	"net/http"
 )
 
-const StandingsEndpoint = "https://esports-api.lolesports.com/persisted/gw/getStandings"
-const RegularSeasonId = "110413046183015975"
+const (
+	StandingsEndpoint = "https://esports-api.lolesports.com/persisted/gw/getStandings"
+	RegularSeasonId   = "110413046183015975"
+)
 
 type Application struct {
 	apiKey string

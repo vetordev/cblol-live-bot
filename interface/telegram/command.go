@@ -2,6 +2,7 @@ package telegrambot
 
 import (
 	"cblol-bot/application/ranking"
+	"cblol-bot/application/week"
 	"log"
 	"os"
 )
@@ -13,6 +14,7 @@ type Command struct {
 	arguments string
 
 	rankingApplication *rankingapp.Application
+	weekApplication    *week.Application
 }
 
 func (c *Command) exec() string {
@@ -23,6 +25,8 @@ func (c *Command) exec() string {
 	case "ranking":
 		response = c.rankingApplication.GetRanking()
 		break
+	case "week":
+		response = c.weekApplication.GetWeekMatches()
 	default:
 		response = InvalidCommand
 	}
@@ -44,6 +48,7 @@ func NewCommand(command string, arguments string) *Command {
 	}
 
 	rankingApplication := rankingapp.New(lolApiKey, lang)
+	weekApplication := week.New(lolApiKey, lang)
 
-	return &Command{command, arguments, rankingApplication}
+	return &Command{command, arguments, rankingApplication, weekApplication}
 }
