@@ -2,6 +2,7 @@ package week
 
 import (
 	"cblol-bot/domain/model/match"
+	matchsvc "cblol-bot/domain/service/match"
 	"cblol-bot/util/date"
 	"fmt"
 	"strings"
@@ -9,34 +10,35 @@ import (
 )
 
 type Week struct {
+	block   string
 	matches []*match.Match
 }
 
-func findWeek(matches []*match.Match) int {
+func findBlock(matches []*match.Match) string {
 
 	now := time.Now()
 	today := date.ResetHours(now)
 
-	var week int
+	var blockName string
 
-	for _, match := range matches {
-		matchDay := date.ResetHours(*match.Schedule)
+	for _, m := range matches {
+		matchDay := date.ResetHours(*m.Schedule)
 
 		if matchDay.After(today) || matchDay.Equal(today) {
-			week = match.Week
+			blockName = m.Block
 			break
 		}
 
 	}
 
-	return week
+	return blockName
 }
 
-func filterMatchesByWeek(allMatches []*match.Match, week int) []*match.Match {
+func filterMatchesByBlock(allMatches []*match.Match, block string) []*match.Match {
 	var matches []*match.Match
 
 	for _, m := range allMatches {
-		if m.Week == week {
+		if m.Block == block {
 			matches = append(matches, m)
 		}
 	}
@@ -44,7 +46,7 @@ func filterMatchesByWeek(allMatches []*match.Match, week int) []*match.Match {
 	return matches
 }
 
-func (w *Week) MatchesPerDay() string {
+func (w *Week) Matches() string {
 
 	matchDays := make(map[time.Time][]*match.Match)
 
@@ -54,36 +56,21 @@ func (w *Week) MatchesPerDay() string {
 		matchDays[matchDay] = append(matchDays[matchDay], m)
 	}
 
-	var week []string
+	var weekMatches []string
 
 	for day, matches := range matchDays {
-		var formattedMatches []string
-
-		for _, m := range matches {
-			s := fmt.Sprintf("%s x %s - %d:%d", m.Team1.Name, m.Team2.Name, m.Schedule.Hour(), m.Schedule.Minute())
-
-			if m.State == match.Completed {
-
-			}
-
-			formattedMatches = append(formattedMatches, s)
-		}
-
-		weekDay := date.GetWeekDayInPt(day.Weekday())
-		j := strings.Join(formattedMatches, "\n")
-
-		week = append(
-			week,
-			fmt.Sprintf("%s - %d/%d\n\n%s", weekDay, day.Day(), day.Month(), j),
-		)
+		weekMatches = append(weekMatches, matchsvc.MatchesPerDay(day, matches))
 	}
 
-	return strings.Join(week, "\n\n")
+	formattedWeek := strings.Join(weekMatches, "\n\n")
+
+	return fmt.Sprintf("<b>%s</b>\n", w.block) + formattedWeek
 }
 
 func New(allMatches []*match.Match) *Week {
 
-	weekMatches := filterMatchesByWeek(allMatches, findWeek(allMatches))
+	block := findBlock(allMatches)
+	weekMatches := filterMatchesByBlock(allMatches, block)
 
-	return &Week{weekMatches}
+	return &Week{block, weekMatches}
 }

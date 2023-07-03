@@ -10,7 +10,7 @@ type Ranking struct {
 	teams []*team.Team
 }
 
-func (r *Ranking) FormatToString() string {
+func (r *Ranking) Format() string {
 
 	var ranking []string
 

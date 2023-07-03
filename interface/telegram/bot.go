@@ -14,6 +14,7 @@ type Bot struct {
 func (b *Bot) Reply(chatId int64, messageId int, text string) {
 
 	msg := tgbot.NewMessage(chatId, text)
+	msg.ParseMode = "HTML"
 	msg.ReplyToMessageID = messageId
 
 	if _, err := b.bot.Send(msg); err != nil {

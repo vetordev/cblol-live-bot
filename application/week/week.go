@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"regexp"
-	"strconv"
 	"time"
 )
 
@@ -60,14 +59,13 @@ func (a *Application) GetWeekMatches() string {
 	location, _ := time.LoadLocation("America/Sao_Paulo")
 
 	for _, event := range events {
-		startTime, err := time.ParseInLocation(time.RFC3339, event.StartTime, location)
+		startTime, err := time.Parse(time.RFC3339, event.StartTime)
+		startTime = startTime.In(location)
 
 		if err != nil {
 			fmt.Println(err)
 			return CouldNotGetWeekMatches
 		}
-
-		weekNum, err := strconv.Atoi(onlyNumbers.ReplaceAllString(event.BlockName, ""))
 
 		if err != nil {
 			fmt.Println(err)
@@ -90,12 +88,12 @@ func (a *Application) GetWeekMatches() string {
 			matchState = match.Completed
 		}
 
-		matches = append(matches, match.New(&startTime, weekNum, matchState, teams[0], teams[1], winner))
+		matches = append(matches, match.New(&startTime, event.BlockName, matchState, teams[0], teams[1], winner))
 	}
 
 	weekService := week.New(matches)
 
-	return weekService.MatchesPerDay()
+	return weekService.Matches()
 }
 
 func New(apiKey string, lang string) *Application {

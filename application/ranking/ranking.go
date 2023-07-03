@@ -63,7 +63,7 @@ func (a *Application) GetRanking() string {
 
 	ranking := rankingmodel.New(teams)
 
-	return ranking.FormatToString()
+	return ranking.Format()
 }
 
 func New(apiKey string, lang string) *Application {
