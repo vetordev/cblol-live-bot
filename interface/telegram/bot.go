@@ -4,11 +4,11 @@ import (
 	"fmt"
 	tgbot "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
-	"os"
 )
 
 type Bot struct {
-	bot *tgbot.BotAPI
+	bot            *tgbot.BotAPI
+	commandHandler *CommandHandler
 }
 
 func (b *Bot) Reply(chatId int64, messageId int, text string) {
@@ -27,8 +27,7 @@ func (b *Bot) handleUpdate(update tgbot.Update) {
 		return
 	}
 
-	command := NewCommand(update.Message.Command(), update.Message.CommandArguments())
-	response := command.exec()
+	response := b.commandHandler.Exec(update.Message.Command(), update.Message.CommandArguments())
 
 	b.Reply(update.Message.Chat.ID, update.Message.MessageID, response)
 }
@@ -45,11 +44,9 @@ func (b *Bot) Run() {
 	}
 }
 
-func New(debugMode bool) *Bot {
-	telegramToken := os.Getenv("TELEGRAM_TOKEN")
-	if telegramToken == "" {
-		log.Fatal("TELEGRAM_TOKEN is empty")
-	}
+func New(telegramToken string, lolApiKey string, apiLang string, debugMode bool) *Bot {
+
+	commandHandler := NewCommand(lolApiKey, apiLang)
 
 	bot, err := tgbot.NewBotAPI(telegramToken)
 	if err != nil {
@@ -58,5 +55,5 @@ func New(debugMode bool) *Bot {
 
 	bot.Debug = debugMode
 
-	return &Bot{bot}
+	return &Bot{bot, commandHandler}
 }

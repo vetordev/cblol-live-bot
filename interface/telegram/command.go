@@ -3,25 +3,20 @@ package telegrambot
 import (
 	"cblol-bot/application/match"
 	"cblol-bot/application/ranking"
-	"log"
-	"os"
 )
 
 const InvalidCommand = "Oops! Comando inválido."
 
-type Command struct {
-	command   string
-	arguments string
-
+type CommandHandler struct {
 	rankingApplication *ranking.Application
 	matchApplication   *match.Application
 }
 
-func (c *Command) exec() string {
+func (c *CommandHandler) Exec(command string, arguments string) string {
 
 	var response string
 
-	switch c.command {
+	switch command {
 	case "ranking":
 		response = c.rankingApplication.GetRanking()
 		break
@@ -38,21 +33,9 @@ func (c *Command) exec() string {
 	return response
 }
 
-func NewCommand(command string, arguments string) *Command {
-	lolApiKey := os.Getenv("LOL_API_KEY")
+func NewCommand(lolApiKey string, apiLang string) *CommandHandler {
+	rankingApplication := ranking.New(lolApiKey, apiLang)
+	matchApplication := match.New(lolApiKey, apiLang)
 
-	if lolApiKey == "" {
-		log.Fatal("LOL_API_KEY is empty")
-	}
-
-	lang := os.Getenv("LOL_API_LANG")
-
-	if lolApiKey == "" {
-		log.Fatal("LOL_API_LANG is empty")
-	}
-
-	rankingApplication := ranking.New(lolApiKey, lang)
-	matchApplication := match.New(lolApiKey, lang)
-
-	return &Command{command, arguments, rankingApplication, matchApplication}
+	return &CommandHandler{rankingApplication, matchApplication}
 }
