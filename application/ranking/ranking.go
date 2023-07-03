@@ -1,8 +1,8 @@
 package ranking
 
 import (
-	rankingmodel "cblol-bot/domain/model/ranking"
-	teammodel "cblol-bot/domain/model/team"
+	ranking "cblol-bot/domain/model/ranking"
+	team "cblol-bot/domain/model/team"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -54,14 +54,14 @@ func (a *Application) GetRanking() string {
 
 	rankingsDto := standingsData.Data.Standings[0].Stages[0].Sections[0].Rankings
 
-	var teams []*teammodel.Team
+	var teams []*team.Team
 
 	for _, rankingDto := range rankingsDto {
 		teamDto := rankingDto.Teams[0]
-		teams = append(teams, teammodel.New(teamDto.Name, teamDto.Record.Wins, teamDto.Record.Losses))
+		teams = append(teams, team.New(teamDto.Name, teamDto.Record.Wins, teamDto.Record.Losses))
 	}
 
-	ranking := rankingmodel.New(teams)
+	ranking := ranking.New(teams)
 
 	return ranking.Format()
 }
