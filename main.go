@@ -2,6 +2,7 @@ package main
 
 import (
 	telegrambot "cblol-bot/interface/telegram"
+	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -11,7 +12,7 @@ import (
 func loadEnv() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("could not load env file: %s", err.Error())
+		fmt.Printf("could not load env file: %s", err.Error())
 	}
 }
 
