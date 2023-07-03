@@ -17,7 +17,7 @@ func MatchesPerDay(day time.Time, matches []*match.Match) string {
 	}
 
 	weekDay := date.GetWeekDayInPt(day.Weekday())
-	j := strings.Join(formattedMatches, "\n\n")
+	j := strings.Join(formattedMatches, "\n")
 
 	return fmt.Sprintf("\n📆 %s - %d/%d\n\n%s", weekDay, day.Day(), day.Month(), j)
 }
