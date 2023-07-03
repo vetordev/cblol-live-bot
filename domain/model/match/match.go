@@ -4,6 +4,7 @@ import (
 	"cblol-bot/domain/model/team"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -35,13 +36,29 @@ func (m *Match) Format() string {
 		minute = "0" + minute
 	}
 
-	s := fmt.Sprintf("<b>%s</b> X <b>%s</b> - %d:%s", m.Team1.Name, m.Team2.Name, hour, minute)
+	team1ShortName := getShortName(m.Team1.Name)
+	team2ShortName := getShortName(m.Team2.Name)
+
+	s := fmt.Sprintf("<b>%s</b> X <b>%s</b> - %d:%s", team1ShortName, team2ShortName, hour, minute)
 
 	if m.State == Completed {
-		s += fmt.Sprintf(" (%s 🏆)", m.Winner.Name)
+		s += fmt.Sprintf(" (%s 🏆)", getShortName(m.Winner.Name))
 	}
 
 	return s
+}
+
+func getShortName(name string) string {
+
+	split := strings.Split(name, " ")
+
+	shortName := split[0]
+
+	if len(split) > 2 {
+		shortName += " " + split[1]
+	}
+
+	return shortName
 }
 
 func New(schedule *time.Time, block string, state State, team1 *team.Team, team2 *team.Team, winner *team.Team) *Match {
