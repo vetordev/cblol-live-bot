@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"strconv"
 )
 
 func loadEnv() {
@@ -35,7 +36,13 @@ func main() {
 		log.Fatal("LOL_API_LANG is empty")
 	}
 
-	bot := telegrambot.New(telegramToken, lolApiKey, lang, true)
+	debug, err := strconv.ParseBool(os.Getenv("DEBUG"))
+
+	if err != nil {
+		debug = false
+	}
+
+	bot := telegrambot.New(telegramToken, lolApiKey, lang, debug)
 
 	bot.Run()
 
