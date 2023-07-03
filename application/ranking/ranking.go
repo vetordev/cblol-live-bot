@@ -1,4 +1,4 @@
-package rankingapp
+package ranking
 
 import (
 	rankingmodel "cblol-bot/domain/model/ranking"

@@ -1,4 +1,4 @@
-package week
+package match
 
 type Outcome string
 type MatchStateDto string

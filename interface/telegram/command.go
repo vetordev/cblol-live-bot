@@ -1,8 +1,8 @@
 package telegrambot
 
 import (
+	"cblol-bot/application/match"
 	"cblol-bot/application/ranking"
-	"cblol-bot/application/week"
 	"log"
 	"os"
 )
@@ -13,8 +13,8 @@ type Command struct {
 	command   string
 	arguments string
 
-	rankingApplication *rankingapp.Application
-	weekApplication    *week.Application
+	rankingApplication *ranking.Application
+	matchApplication   *match.Application
 }
 
 func (c *Command) exec() string {
@@ -26,7 +26,11 @@ func (c *Command) exec() string {
 		response = c.rankingApplication.GetRanking()
 		break
 	case "week":
-		response = c.weekApplication.GetWeekMatches()
+		response = c.matchApplication.GetWeekMatches()
+		break
+	case "today":
+		response = c.matchApplication.GetTodayMatches()
+		break
 	default:
 		response = InvalidCommand
 	}
@@ -47,8 +51,8 @@ func NewCommand(command string, arguments string) *Command {
 		log.Fatal("LOL_API_LANG is empty")
 	}
 
-	rankingApplication := rankingapp.New(lolApiKey, lang)
-	weekApplication := week.New(lolApiKey, lang)
+	rankingApplication := ranking.New(lolApiKey, lang)
+	matchApplication := match.New(lolApiKey, lang)
 
-	return &Command{command, arguments, rankingApplication, weekApplication}
+	return &Command{command, arguments, rankingApplication, matchApplication}
 }

@@ -1,4 +1,4 @@
-package rankingapp
+package ranking
 
 type StandingsDataDto struct {
 	Data struct {
