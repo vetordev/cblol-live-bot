@@ -33,9 +33,6 @@ func (c *CommandHandler) Exec(command string, arguments string) string {
 	return response
 }
 
-func NewCommand(lolApiKey string, apiLang string) *CommandHandler {
-	rankingApplication := ranking.New(lolApiKey, apiLang)
-	matchApplication := match.New(lolApiKey, apiLang)
-
+func NewCommand(rankingApplication *ranking.Application, matchApplication *match.Application) *CommandHandler {
 	return &CommandHandler{rankingApplication, matchApplication}
 }

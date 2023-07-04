@@ -44,9 +44,7 @@ func (b *Bot) Run() {
 	}
 }
 
-func New(telegramToken string, lolApiKey string, apiLang string, debugMode bool) *Bot {
-
-	commandHandler := NewCommand(lolApiKey, apiLang)
+func New(commandHandler *CommandHandler, telegramToken string, debugMode bool) *Bot {
 
 	bot, err := tgbot.NewBotAPI(telegramToken)
 	if err != nil {

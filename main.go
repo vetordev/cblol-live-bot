@@ -1,6 +1,8 @@
 package main
 
 import (
+	"cblol-bot/application/match"
+	"cblol-bot/application/ranking"
 	telegrambot "cblol-bot/interface/telegram"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -43,7 +45,12 @@ func main() {
 		debug = false
 	}
 
-	bot := telegrambot.New(telegramToken, lolApiKey, lang, debug)
+	matchApplication := match.New(lolApiKey, lang)
+	rankingApplication := ranking.New(lolApiKey, lang)
+
+	commandHandler := telegrambot.NewCommand(rankingApplication, matchApplication)
+
+	bot := telegrambot.New(commandHandler, telegramToken, debug)
 
 	bot.Run()
 
