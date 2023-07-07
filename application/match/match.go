@@ -25,7 +25,7 @@ type Application struct {
 	lang   string
 }
 
-func (a *Application) listSchedulesFromApi() (*DataDto, error) {
+func (a *Application) ListMatchesFromAPI() ([]*match.Match, error) {
 
 	req, err := http.NewRequest(http.MethodGet, ScheduleEndpoint, nil)
 
@@ -62,67 +62,7 @@ func (a *Application) listSchedulesFromApi() (*DataDto, error) {
 		return nil, err
 	}
 
-	return &scheduleData, nil
-}
-
-func (a *Application) GetWeekMatches() string {
-
 	var matches []*match.Match
-
-	scheduleData, err := a.listSchedulesFromApi()
-
-	if err != nil {
-		fmt.Println(err)
-		return CouldNotGetWeekMatches
-	}
-
-	events := scheduleData.Data.Schedule.Events
-
-	location, _ := time.LoadLocation("America/Sao_Paulo")
-
-	for _, event := range events {
-		startTime, err := time.Parse(time.RFC3339, event.StartTime)
-		startTime = startTime.In(location)
-
-		if err != nil {
-			fmt.Println(err)
-			return CouldNotGetWeekMatches
-		}
-
-		var teams []*team.Team
-		var winner *team.Team
-
-		for _, t := range event.Match.Teams {
-			matchTeam := team.New(t.Name, t.Record.Wins, t.Record.Losses)
-			teams = append(teams, matchTeam)
-			if t.Result.Outcome == Win {
-				winner = matchTeam
-			}
-		}
-
-		matchState := match.Unstarted
-		if event.State == Completed {
-			matchState = match.Completed
-		}
-
-		matches = append(matches, match.New(&startTime, event.BlockName, matchState, teams[0], teams[1], winner))
-	}
-
-	weekService := week.New(matches)
-
-	return weekService.Matches()
-}
-
-func (a *Application) GetTodayMatches() string {
-
-	var matches []*match.Match
-
-	scheduleData, err := a.listSchedulesFromApi()
-
-	if err != nil {
-		fmt.Println(err)
-		return CouldNotGetWeekMatches
-	}
 
 	events := scheduleData.Data.Schedule.Events
 
@@ -136,7 +76,7 @@ func (a *Application) GetTodayMatches() string {
 
 		if err != nil {
 			fmt.Println(err)
-			return CouldNotGetTodayMatches
+			return nil, err
 		}
 
 		eventDay := date.ResetHours(startTime)
@@ -164,9 +104,37 @@ func (a *Application) GetTodayMatches() string {
 		matches = append(matches, match.New(&startTime, event.BlockName, matchState, teams[0], teams[1], winner))
 	}
 
+	return matches, nil
+}
+
+func (a *Application) GetWeekMatches() string {
+
+	matches, err := a.ListMatchesFromAPI()
+
+	if err != nil {
+		fmt.Println(err)
+		return CouldNotGetWeekMatches
+	}
+
+	weekService := week.New(matches)
+
+	return weekService.Matches()
+}
+
+func (a *Application) GetTodayMatches() string {
+
+	matches, err := a.ListMatchesFromAPI()
+
+	if err != nil {
+		fmt.Println(err)
+		return CouldNotGetTodayMatches
+	}
+
 	if len(matches) == 0 {
 		return NoGames
 	}
+
+	today := date.ResetHours(time.Now())
 
 	return matchsvc.MatchesPerDay(today, matches)
 }
