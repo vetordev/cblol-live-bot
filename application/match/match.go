@@ -43,7 +43,17 @@ func (a *Application) listSchedulesFromApi() (*DataDto, error) {
 
 	resp, err := http.DefaultClient.Do(req)
 
+	if err != nil {
+		return nil, err
+	}
+
 	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
 
 	var scheduleData DataDto
 	err = json.Unmarshal(body, &scheduleData)
