@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func MatchesPerDay(day time.Time, allMatches []*match.Match) string {
+func MatchesByDay(day time.Time, allMatches []*match.Match) string {
 
 	var formattedMatches []string
 

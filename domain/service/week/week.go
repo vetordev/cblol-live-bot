@@ -59,7 +59,7 @@ func (w *Week) Matches() string {
 	var weekMatches []string
 
 	for day, matches := range matchDays {
-		weekMatches = append(weekMatches, matchsvc.MatchesPerDay(day, matches))
+		weekMatches = append(weekMatches, matchsvc.MatchesByDay(day, matches))
 	}
 
 	formattedWeek := strings.Join(weekMatches, "\n\n")
