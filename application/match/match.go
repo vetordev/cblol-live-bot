@@ -68,8 +68,6 @@ func (a *Application) ListMatchesFromAPI() ([]*match.Match, error) {
 
 	location, _ := time.LoadLocation("America/Sao_Paulo")
 
-	today := date.ResetHours(time.Now())
-
 	for _, event := range events {
 		startTime, err := time.Parse(time.RFC3339, event.StartTime)
 		startTime = startTime.In(location)
@@ -77,12 +75,6 @@ func (a *Application) ListMatchesFromAPI() ([]*match.Match, error) {
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
-		}
-
-		eventDay := date.ResetHours(startTime)
-
-		if !today.Equal(eventDay) {
-			continue
 		}
 
 		var teams []*team.Team
