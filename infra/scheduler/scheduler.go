@@ -12,8 +12,9 @@ type Scheduler struct {
 
 func (s *Scheduler) Load() {
 
-	alertJob := job.NewAlert()
-	s.cron.AddJob("a", alertJob)
+	scheduleNotification := job.NewScheduleNotification()
+
+	s.cron.AddJob("@midnight", scheduleNotification)
 }
 
 func New() *Scheduler {
