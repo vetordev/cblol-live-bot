@@ -99,6 +99,25 @@ func (a *Application) ListMatchesFromAPI() ([]*match.Match, error) {
 	return matches, nil
 }
 
+func (a *Application) ListTodayMatchesFromAPI() ([]*match.Match, error) {
+	matches, err := a.ListMatchesFromAPI()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var todayMatches []*match.Match
+	today := date.ResetHours(time.Now())
+
+	for _, m := range matches {
+		if date.ResetHours(*m.Schedule).Equal(today) {
+			todayMatches = append(todayMatches, m)
+		}
+	}
+
+	return todayMatches, nil
+}
+
 func (a *Application) GetWeekMatches() string {
 
 	matches, err := a.ListMatchesFromAPI()
@@ -115,27 +134,18 @@ func (a *Application) GetWeekMatches() string {
 
 func (a *Application) GetTodayMatches() string {
 
-	matches, err := a.ListMatchesFromAPI()
+	matches, err := a.ListTodayMatchesFromAPI()
 
 	if err != nil {
 		fmt.Println(err)
 		return CouldNotGetTodayMatches
 	}
 
-	var todayMatches []*match.Match
-	today := date.ResetHours(time.Now())
-
-	for _, m := range matches {
-		if date.ResetHours(*m.Schedule).Equal(today) {
-			todayMatches = append(todayMatches, m)
-		}
-	}
-
 	if len(matches) == 0 {
 		return NoGames
 	}
 
-	return matchsvc.FormatMatchesPerDay(today, todayMatches)
+	return matchsvc.FormatMatchesPerDay(time.Now(), matches)
 }
 
 func New(apiKey string, lang string) *Application {
