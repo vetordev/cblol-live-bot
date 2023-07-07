@@ -46,7 +46,7 @@ func filterMatchesByBlock(allMatches []*match.Match, block string) []*match.Matc
 	return matches
 }
 
-func (w *Week) Matches() string {
+func (w *Week) FormatWeekMatches() string {
 
 	matchDays := make(map[time.Time][]*match.Match)
 
@@ -59,7 +59,7 @@ func (w *Week) Matches() string {
 	var weekMatches []string
 
 	for day, matches := range matchDays {
-		weekMatches = append(weekMatches, matchsvc.MatchesByDay(day, matches))
+		weekMatches = append(weekMatches, matchsvc.FormatMatchesPerDay(day, matches))
 	}
 
 	formattedWeek := strings.Join(weekMatches, "\n\n")

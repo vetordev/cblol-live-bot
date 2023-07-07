@@ -118,7 +118,7 @@ func (a *Application) GetWeekMatches() string {
 
 	weekService := week.New(matches)
 
-	return weekService.Matches()
+	return weekService.FormatWeekMatches()
 }
 
 func (a *Application) GetTodayMatches() string {
@@ -130,13 +130,20 @@ func (a *Application) GetTodayMatches() string {
 		return CouldNotGetTodayMatches
 	}
 
+	var todayMatches []*match.Match
+	today := date.ResetHours(time.Now())
+
+	for _, m := range matches {
+		if date.ResetHours(*m.Schedule).Equal(today) {
+			todayMatches = append(todayMatches, m)
+		}
+	}
+
 	if len(matches) == 0 {
 		return NoGames
 	}
 
-	today := date.ResetHours(time.Now())
-
-	return matchsvc.MatchesPerDay(today, matches)
+	return matchsvc.FormatMatchesPerDay(today, todayMatches)
 }
 
 func New(apiKey string, lang string) *Application {
