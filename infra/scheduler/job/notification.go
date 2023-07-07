@@ -4,7 +4,6 @@ type ScheduleNotification struct {
 }
 
 func (a *ScheduleNotification) Run() {
-
 }
 
 func NewScheduleNotification() *ScheduleNotification {

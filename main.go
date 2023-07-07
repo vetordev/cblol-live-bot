@@ -3,6 +3,7 @@ package main
 import (
 	"cblol-bot/application/match"
 	"cblol-bot/application/ranking"
+	"cblol-bot/infra/scheduler"
 	telegrambot "cblol-bot/interface/telegram"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -44,6 +45,9 @@ func main() {
 	if err != nil {
 		debug = false
 	}
+
+	s := scheduler.New()
+	s.Load()
 
 	matchApplication := match.New(lolApiKey, lang)
 	rankingApplication := ranking.New(lolApiKey, lang)

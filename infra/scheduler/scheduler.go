@@ -15,6 +15,8 @@ func (s *Scheduler) Load() {
 	scheduleNotification := job.NewScheduleNotification()
 
 	s.cron.AddJob("@midnight", scheduleNotification)
+
+	s.cron.Start()
 }
 
 func New() *Scheduler {
