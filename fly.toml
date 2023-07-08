@@ -11,7 +11,6 @@ primary_region = "gru"
   buildpacks = ["gcr.io/paketo-buildpacks/go"]
 
 [env]
-  PORT = "8080"
   LOL_API_KEY="0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"
   LOL_API_LANG="pt-BR"
   DEBUG=false

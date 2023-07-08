@@ -3,6 +3,7 @@ package main
 import (
 	"cblol-bot/application/match"
 	"cblol-bot/application/ranking"
+	"cblol-bot/infra/database"
 	"cblol-bot/infra/scheduler"
 	telegrambot "cblol-bot/interface/telegram"
 	"fmt"
@@ -45,6 +46,14 @@ func main() {
 	if err != nil {
 		debug = false
 	}
+
+	databaseUrl := os.Getenv("DATABASE_URL")
+
+	if databaseUrl == "" {
+		log.Fatal("DATABASE_URL is empty")
+	}
+
+	database.RunMigrations(databaseUrl)
 
 	s := scheduler.New()
 	s.Load()
