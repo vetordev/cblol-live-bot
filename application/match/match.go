@@ -97,7 +97,7 @@ func (a *Application) ListMatchesFromAPI() ([]*match.Match, error) {
 			matchState = match.Completed
 		}
 
-		matches = append(matches, match.New(&startTime, event.BlockName, matchState, teams[0], teams[1], winner))
+		matches = append(matches, match.New(startTime, event.BlockName, matchState, teams[0], teams[1], winner))
 	}
 
 	return matches, nil
@@ -114,7 +114,7 @@ func (a *Application) ListTodayMatchesFromAPI() ([]*match.Match, error) {
 	today := date.ResetHours(time.Now())
 
 	for _, m := range matches {
-		if date.ResetHours(*m.Schedule).Equal(today) {
+		if date.ResetHours(m.Schedule).Equal(today) {
 			todayMatches = append(todayMatches, m)
 		}
 	}

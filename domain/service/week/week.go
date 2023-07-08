@@ -22,7 +22,7 @@ func findBlock(matches []*match.Match) string {
 	var blockName string
 
 	for _, m := range matches {
-		matchDay := date.ResetHours(*m.Schedule)
+		matchDay := date.ResetHours(m.Schedule)
 
 		if matchDay.After(today) || matchDay.Equal(today) {
 			blockName = m.Block
@@ -51,7 +51,7 @@ func (w *Week) FormatWeekMatches() string {
 	matchDays := make(map[time.Time][]*match.Match)
 
 	for _, m := range w.matches {
-		matchDay := date.ResetHours(*m.Schedule)
+		matchDay := date.ResetHours(m.Schedule)
 
 		matchDays[matchDay] = append(matchDays[matchDay], m)
 	}

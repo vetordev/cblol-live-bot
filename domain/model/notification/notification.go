@@ -12,6 +12,6 @@ type Notification struct {
 	User     *user.User
 }
 
-func New() *Notification {
-	return &Notification{}
+func New(id int, schedule time.Time, enable bool, user *user.User) *Notification {
+	return &Notification{id, schedule, enable, user}
 }

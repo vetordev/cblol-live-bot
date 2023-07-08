@@ -16,7 +16,7 @@ const (
 )
 
 type Match struct {
-	Schedule *time.Time
+	Schedule time.Time
 	Block    string
 	State    State
 
@@ -61,6 +61,6 @@ func getShortName(name string) string {
 	return shortName
 }
 
-func New(schedule *time.Time, block string, state State, team1 *team.Team, team2 *team.Team, winner *team.Team) *Match {
+func New(schedule time.Time, block string, state State, team1 *team.Team, team2 *team.Team, winner *team.Team) *Match {
 	return &Match{schedule, block, state, team1, team2, winner}
 }
