@@ -67,6 +67,7 @@ func (w *Week) FormatWeekMatches() string {
 	return fmt.Sprintf("<b>%s</b>\n", w.block) + formattedWeek
 }
 
+// @TODO: refactor constructor
 func New(allMatches []*match.Match) *Week {
 
 	block := findBlock(allMatches)

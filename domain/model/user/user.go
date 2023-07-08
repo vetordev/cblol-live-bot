@@ -1,11 +1,10 @@
 package user
 
 type User struct {
-	Id     int
-	ChatId string
+	ChatId int64
 	Name   string
 }
 
-func New(id int, chatId string, name string) *User {
-	return &User{id, chatId, name}
+func New(chatId int64, name string) *User {
+	return &User{chatId, name}
 }

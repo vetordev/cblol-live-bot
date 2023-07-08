@@ -13,6 +13,11 @@ import (
 	"strconv"
 )
 
+/*
+@TODO: ref service package name to entitysvc
+@TODO: ref application package to entityapp
+*/
+
 func loadEnv() {
 	err := godotenv.Load()
 	if err != nil {

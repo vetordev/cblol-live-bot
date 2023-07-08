@@ -5,11 +5,13 @@ import (
 	"time"
 )
 
+const DefaultScheduleTime = "10:00:00"
+
 type Notification struct {
-	Id       int
-	Schedule time.Time
-	Enable   bool
-	User     *user.User
+	Id           int
+	ScheduledFor time.Time
+	Enable       bool
+	User         *user.User
 }
 
 func New(id int, schedule time.Time, enable bool, user *user.User) *Notification {
