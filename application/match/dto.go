@@ -2,6 +2,7 @@ package match
 
 type Outcome string
 type MatchStateDto string
+type EventType string
 
 const (
 	Unstarted MatchStateDto = "unstarted"
@@ -11,6 +12,10 @@ const (
 const (
 	Loss Outcome = "loss"
 	Win  Outcome = "win"
+)
+
+const (
+	Match EventType = "match"
 )
 
 type DataDto struct {
@@ -25,6 +30,7 @@ type ScheduleDto struct {
 
 type EventsDto struct {
 	StartTime string        `json:"startTime"`
+	Type      EventType     `json:"type"`
 	State     MatchStateDto `json:"state"`
 	Match     MatchDto      `json:"match"`
 	BlockName string        `json:"blockName"`

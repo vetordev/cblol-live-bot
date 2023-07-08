@@ -69,6 +69,10 @@ func (a *Application) ListMatchesFromAPI() ([]*match.Match, error) {
 	location, _ := time.LoadLocation("America/Sao_Paulo")
 
 	for _, event := range events {
+		if event.Type != Match {
+			continue
+		}
+
 		startTime, err := time.Parse(time.RFC3339, event.StartTime)
 		startTime = startTime.In(location)
 
