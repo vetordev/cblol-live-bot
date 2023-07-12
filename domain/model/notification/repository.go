@@ -13,6 +13,5 @@ var CouldNotUpdate = errors.New("could not update this notification")
 type Repository interface {
 	Create(time.Time, bool, *user.User) (int64, error)
 	Update(*Notification) error
-	Find(int) *Notification
 	FindByUser(*user.User) (*Notification, error)
 }

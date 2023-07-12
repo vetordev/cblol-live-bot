@@ -23,7 +23,7 @@ func (r *NotificationRepository) Create(scheduledFor time.Time, enable bool, u *
 	defer stmt.Close()
 
 	scheduleTime := fmt.Sprintf("%d:%d:%d", scheduledFor.Hour(), scheduledFor.Minute(), scheduledFor.Second())
-	result, err := stmt.Exec(stmt, scheduleTime, enable, u.ChatId)
+	result, err := stmt.Exec(scheduleTime, enable, u.ChatId)
 
 	if err != nil {
 		fmt.Println(err)
@@ -78,9 +78,14 @@ func (r *NotificationRepository) FindByUser(u *user.User) (*notification.Notific
 	var n notification.Notification
 
 	n.User = u
-
 	var scheduleTime string
-	stmt.QueryRow(u.ChatId).Scan(&n.Id, &scheduleTime, &n.Enable)
+
+	err = stmt.QueryRow(u.ChatId).Scan(&n.Id, &scheduleTime, &n.Enable)
+
+	if err != nil {
+		fmt.Println(err)
+		return nil, notification.NotFoundByUser
+	}
 
 	n.ScheduledFor, _ = time.Parse(time.TimeOnly, scheduleTime)
 
