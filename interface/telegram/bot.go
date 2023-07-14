@@ -27,7 +27,7 @@ func (b *Bot) handleUpdate(update tgbot.Update) {
 		return
 	}
 
-	response := b.commandHandler.Exec(update.Message.Command(), update.Message.CommandArguments())
+	response := b.commandHandler.Exec(update.Message)
 
 	b.Reply(update.Message.Chat.ID, update.Message.MessageID, response)
 }

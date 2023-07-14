@@ -2,8 +2,10 @@ package main
 
 import (
 	"cblol-bot/application/match"
+	"cblol-bot/application/notification"
 	"cblol-bot/application/ranking"
 	"cblol-bot/infra/database"
+	"cblol-bot/infra/database/repository"
 	"cblol-bot/infra/scheduler"
 	telegrambot "cblol-bot/interface/telegram"
 	"fmt"
@@ -58,15 +60,20 @@ func main() {
 		log.Fatal("DATABASE_URL is empty")
 	}
 
-	database.RunMigrations(databaseUrl)
-
 	s := scheduler.New()
 	s.Load()
 
+	database.RunMigrations(databaseUrl)
+
+	db := database.Connect(databaseUrl)
+	userRepository := repository.NewUserRepository(db)
+	notificationRepository := repository.NewNotificationRepository(db)
+
 	matchApplication := match.New(lolApiKey, lang)
 	rankingApplication := ranking.New(lolApiKey, lang)
+	notificationApplication := notification.New(matchApplication, userRepository, notificationRepository)
 
-	commandHandler := telegrambot.NewCommand(rankingApplication, matchApplication)
+	commandHandler := telegrambot.NewCommand(rankingApplication, matchApplication, notificationApplication)
 
 	bot := telegrambot.New(commandHandler, telegramToken, debug)
 
