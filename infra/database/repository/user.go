@@ -12,7 +12,7 @@ type UserRepository struct {
 
 func (r *UserRepository) Create(chatId int64, name string) error {
 
-	stmt, err := r.db.Prepare("INSERT INTO users(chat_id, name) (?, ?)")
+	stmt, err := r.db.Prepare("INSERT INTO users(chat_id, name) VALUES(?, ?)")
 
 	if err != nil {
 		fmt.Println(err)

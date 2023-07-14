@@ -33,7 +33,7 @@ func (c *CommandHandler) Exec(message *tgbotapi.Message) string {
 		scheduledTime := message.CommandArguments()
 		response = c.notificationApplication.EnableDailyNotificationOfMatches(
 			message.Chat.ID,
-			message.Chat.UserName,
+			message.From.FirstName,
 			scheduledTime,
 		)
 	default:

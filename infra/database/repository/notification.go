@@ -13,7 +13,7 @@ type NotificationRepository struct {
 }
 
 func (r *NotificationRepository) Create(scheduledFor string, enable bool, u *user.User) (int64, error) {
-	stmt, err := r.db.Prepare("INSERT INTO notifications (scheduled_for, enable, user_id) (?, ?, ?)")
+	stmt, err := r.db.Prepare("INSERT INTO notifications (scheduled_for, enable, user_id) VALUES(?, ?, ?)")
 
 	if err != nil {
 		fmt.Println(err)
@@ -49,7 +49,8 @@ func (r *NotificationRepository) Update(n *notification.Notification) error {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(n.ScheduledFor, n.Enable, n.User.ChatId, n.Id)
+	scheduledFor := fmt.Sprintf("%d:%d:%d", n.ScheduledFor.Hour(), n.ScheduledFor.Minute(), n.ScheduledFor.Second())
+	_, err = stmt.Exec(scheduledFor, n.Enable, n.User.ChatId, n.Id)
 
 	if err != nil {
 		fmt.Println(err)
@@ -59,12 +60,8 @@ func (r *NotificationRepository) Update(n *notification.Notification) error {
 	return nil
 }
 
-func (r *NotificationRepository) Find() {
-
-}
-
 func (r *NotificationRepository) FindByUser(u *user.User) (*notification.Notification, error) {
-	stmt, err := r.db.Prepare("SELECT * from notification WHERE user_id = ?")
+	stmt, err := r.db.Prepare("SELECT id, scheduled_for, enable from notifications WHERE user_id = ?")
 
 	if err != nil {
 		fmt.Println(err)
