@@ -8,21 +8,21 @@ import (
 
 type Scheduler struct {
 	cron *cron.Cron
+
+	scheduleNotificationJob *job.ScheduleNotification
 }
 
 func (s *Scheduler) Load() {
 
-	scheduleNotification := job.NewScheduleNotification()
-
-	s.cron.AddJob("@midnight", scheduleNotification)
+	s.cron.AddJob("@midnight", s.scheduleNotificationJob)
 
 	s.cron.Start()
 }
 
-func New() *Scheduler {
+func New(scheduleNotificationJob *job.ScheduleNotification) *Scheduler {
 	location, _ := time.LoadLocation("America/Sao_Paulo")
 
 	c := cron.New(cron.WithLocation(location))
 
-	return &Scheduler{c}
+	return &Scheduler{c, scheduleNotificationJob}
 }
