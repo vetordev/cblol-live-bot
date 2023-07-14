@@ -131,9 +131,9 @@ func (a *Application) GetWeekMatches() string {
 		return CouldNotGetWeekMatches
 	}
 
-	weekService := week.New(matches)
+	weekService := week.New()
 
-	return weekService.FormatWeekMatches()
+	return weekService.FormatWeekMatches(matches)
 }
 
 func (a *Application) GetTodayMatches() string {
