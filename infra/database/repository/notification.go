@@ -12,7 +12,7 @@ type NotificationRepository struct {
 	db *sql.DB
 }
 
-func (r *NotificationRepository) Create(scheduledFor time.Time, enable bool, u *user.User) (int64, error) {
+func (r *NotificationRepository) Create(scheduledFor string, enable bool, u *user.User) (int64, error) {
 	stmt, err := r.db.Prepare("INSERT INTO notifications (scheduled_for, enable, user_id) (?, ?, ?)")
 
 	if err != nil {
@@ -22,8 +22,7 @@ func (r *NotificationRepository) Create(scheduledFor time.Time, enable bool, u *
 
 	defer stmt.Close()
 
-	scheduleTime := fmt.Sprintf("%d:%d:%d", scheduledFor.Hour(), scheduledFor.Minute(), scheduledFor.Second())
-	result, err := stmt.Exec(scheduleTime, enable, u.ChatId)
+	result, err := stmt.Exec(scheduledFor, enable, u.ChatId)
 
 	if err != nil {
 		fmt.Println(err)
@@ -50,8 +49,7 @@ func (r *NotificationRepository) Update(n *notification.Notification) error {
 
 	defer stmt.Close()
 
-	scheduleTime := fmt.Sprintf("%d:%d:%d", n.ScheduledFor.Hour(), n.ScheduledFor.Minute(), n.ScheduledFor.Second())
-	_, err = stmt.Exec(scheduleTime, n.Enable, n.User.ChatId, n.Id)
+	_, err = stmt.Exec(n.ScheduledFor, n.Enable, n.User.ChatId, n.Id)
 
 	if err != nil {
 		fmt.Println(err)

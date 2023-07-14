@@ -11,6 +11,7 @@ import (
 )
 
 const CouldNotEnableNotifications = "Oops! Não foi possível habilitar as notificações"
+const InvalidScheduledTime = "Informe uma hora de agendamento válida"
 const NotificationsEnabled = "Notificações habilitadadas!"
 
 type Application struct {
@@ -36,10 +37,12 @@ func (a *Application) ScheduleDailyNotificationOfMatches() {
 	notificationService.ScheduleNotifications(matches)
 }
 
-func (a *Application) EnableDailyNotificationOfMatches(chatId int64, userName string, notificationTime string) string {
+func (a *Application) EnableDailyNotificationOfMatches(chatId int64, userName string, scheduledTime string) string {
 
-	if notificationTime == "" {
-		notificationTime = notification.DefaultScheduleTime
+	scheduledTime, err := notification.ValidateScheduledTime(scheduledTime)
+
+	if err != nil {
+		return InvalidScheduledTime
 	}
 
 	if exists := a.userRepository.Exists(chatId); !exists {
@@ -55,8 +58,6 @@ func (a *Application) EnableDailyNotificationOfMatches(chatId int64, userName st
 
 	u := user.New(chatId, userName)
 
-	scheduledFor, err := time.Parse(time.TimeOnly, notificationTime)
-
 	n, err := a.notificationRepository.FindByUser(u)
 
 	if err != nil {
@@ -64,7 +65,7 @@ func (a *Application) EnableDailyNotificationOfMatches(chatId int64, userName st
 			return CouldNotEnableNotifications
 		}
 
-		_, err := a.notificationRepository.Create(scheduledFor, true, u)
+		_, err = a.notificationRepository.Create(scheduledTime, true, u)
 
 		if err != nil {
 			return CouldNotEnableNotifications
@@ -72,6 +73,8 @@ func (a *Application) EnableDailyNotificationOfMatches(chatId int64, userName st
 
 		return NotificationsEnabled
 	}
+
+	scheduledFor, err := time.Parse(time.TimeOnly, scheduledTime)
 
 	n.ScheduledFor = scheduledFor
 

@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-const DefaultScheduleTime = "10:00:00"
-
 type Notification struct {
 	Id           int64
 	ScheduledFor time.Time
