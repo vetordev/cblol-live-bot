@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-const CouldNotEnableNotifications = "Oops! Não foi possível habilitar as notificações"
-const InvalidScheduledTime = "Informe uma hora de agendamento válida"
 const NotificationsEnabled = "Notificações habilitadas!"
 
 type Application struct {

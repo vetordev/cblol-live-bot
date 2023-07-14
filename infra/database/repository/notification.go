@@ -49,7 +49,8 @@ func (r *NotificationRepository) Update(n *notification.Notification) error {
 
 	defer stmt.Close()
 
-	scheduledFor := fmt.Sprintf("%d:%d:%d", n.ScheduledFor.Hour(), n.ScheduledFor.Minute(), n.ScheduledFor.Second())
+	scheduledFor := n.ScheduledFor.Format(time.TimeOnly)
+
 	_, err = stmt.Exec(scheduledFor, n.Enable, n.User.ChatId, n.Id)
 
 	if err != nil {
