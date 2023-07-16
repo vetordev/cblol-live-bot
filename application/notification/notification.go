@@ -16,6 +16,7 @@ type Application struct {
 	matchApplication       *match.Application
 	userRepository         user.Repository
 	notificationRepository notification.Repository
+	notificationService    *notificationsvc.Service
 }
 
 func (a *Application) ScheduleDailyNotificationOfMatches() {
@@ -30,9 +31,13 @@ func (a *Application) ScheduleDailyNotificationOfMatches() {
 		return
 	}
 
-	notificationService := notificationsvc.New()
+	notifications, err := a.notificationRepository.List()
 
-	notificationService.ScheduleNotifications(matches)
+	if err != nil {
+		return
+	}
+
+	a.notificationService.ScheduleNotifications(matches, notifications)
 }
 
 func (a *Application) EnableDailyNotificationOfMatches(chatId int64, userName string, scheduledTime string) string {
@@ -89,6 +94,12 @@ func New(
 	matchApplication *match.Application,
 	userRepository user.Repository,
 	notificationRepository notification.Repository,
+	notificationService *notificationsvc.Service,
 ) *Application {
-	return &Application{matchApplication, userRepository, notificationRepository}
+	return &Application{
+		matchApplication,
+		userRepository,
+		notificationRepository,
+		notificationService,
+	}
 }
