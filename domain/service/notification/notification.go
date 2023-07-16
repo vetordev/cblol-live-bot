@@ -2,21 +2,41 @@ package notification
 
 import (
 	"cblol-bot/domain/model/match"
-	"cblol-bot/domain/model/user"
-	"time"
+	"cblol-bot/domain/model/notification"
+	matchsvc "cblol-bot/domain/service/match"
+	"fmt"
 )
 
 type Service struct {
+	scheduler Scheduler
+	notifier  Notifier
 }
 
-func (s *Service) ScheduleNotifications(matches []*match.Match) {
+func (s *Service) ScheduleNotifications(matches []*match.Match, notifications []*notification.Notification) {
+
+	formattedMatches := matchsvc.FormatMatchesPerDay(matches[0].Schedule, matches)
+
+	for _, n := range notifications {
+
+		text := fmt.Sprintf("Olá, %s. Segue os jogos de hoje:\n\n%s", n.User.Name, formattedMatches)
+
+		spec := fmt.Sprintf("0 %d %d * *", n.ScheduledFor.Minute(), n.ScheduledFor.Hour())
+
+		s.scheduler.Add(spec, func() {
+			s.notifier.Notify(n.User.ChatId, text)
+		})
+	}
 
 }
 
-func (s *Service) EnableMatchNotification(user *user.User, time *time.Time) {
-
+func New(scheduler Scheduler, notifier Notifier) *Service {
+	return &Service{scheduler, notifier}
 }
 
-func New() *Service {
-	return &Service{}
+type Scheduler interface {
+	Add(string, func())
+}
+
+type Notifier interface {
+	Notify(chatId int64, text string)
 }
