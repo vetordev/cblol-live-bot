@@ -61,6 +61,21 @@ func (r *NotificationRepository) Update(n *notification.Notification) error {
 	return nil
 }
 
+func (r *NotificationRepository) List() ([]*notification.Notification, error) {
+	var notifications []*notification.Notification
+
+	stmt, err := r.db.Prepare("SELECT * FROM notifications")
+
+	if err != nil {
+		fmt.Println(err)
+		return nil, notification.CouldNotList
+	}
+
+	defer stmt.Close()
+
+	return notifications, nil
+}
+
 func (r *NotificationRepository) FindByUser(u *user.User) (*notification.Notification, error) {
 	stmt, err := r.db.Prepare("SELECT id, scheduled_for, enable from notifications WHERE user_id = ?")
 

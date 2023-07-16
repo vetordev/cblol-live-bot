@@ -1,28 +1,32 @@
 package scheduler
 
 import (
-	"cblol-bot/infra/scheduler/job"
 	"github.com/robfig/cron/v3"
 	"time"
 )
 
 type Scheduler struct {
 	cron *cron.Cron
-
-	scheduleNotificationJob *job.ScheduleNotification
 }
 
-func (s *Scheduler) Load() {
+func (s *Scheduler) RemoveAll() {
+	jobs := s.cron.Entries()
 
-	s.cron.AddJob("@midnight", s.scheduleNotificationJob)
-
-	s.cron.Start()
+	for _, entry := range jobs {
+		s.cron.Remove(entry.ID)
+	}
 }
 
-func New(scheduleNotificationJob *job.ScheduleNotification) *Scheduler {
+func (s *Scheduler) Add(spec string, cmd func()) {
+	s.cron.AddFunc(spec, cmd)
+}
+
+func New() *Scheduler {
 	location, _ := time.LoadLocation("America/Sao_Paulo")
 
 	c := cron.New(cron.WithLocation(location))
 
-	return &Scheduler{c, scheduleNotificationJob}
+	c.Start()
+
+	return &Scheduler{c}
 }

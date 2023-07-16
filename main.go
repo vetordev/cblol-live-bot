@@ -4,9 +4,11 @@ import (
 	"cblol-bot/application/match"
 	"cblol-bot/application/notification"
 	"cblol-bot/application/ranking"
+	notificationsvc "cblol-bot/domain/service/notification"
 	"cblol-bot/infra/database"
 	"cblol-bot/infra/database/repository"
 	"cblol-bot/infra/scheduler"
+	"cblol-bot/infra/scheduler/job"
 	telegrambot "cblol-bot/interface/telegram"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -60,8 +62,8 @@ func main() {
 		log.Fatal("DATABASE_URL is empty")
 	}
 
+	bot := telegrambot.New(telegramToken, debug)
 	s := scheduler.New()
-	s.Load()
 
 	database.RunMigrations(databaseUrl)
 
@@ -69,14 +71,23 @@ func main() {
 	userRepository := repository.NewUserRepository(db)
 	notificationRepository := repository.NewNotificationRepository(db)
 
+	notificationService := notificationsvc.New(s, bot)
+
 	matchApplication := match.New(lolApiKey, lang)
 	rankingApplication := ranking.New(lolApiKey, lang)
-	notificationApplication := notification.New(matchApplication, userRepository, notificationRepository)
+	notificationApplication := notification.New(
+		matchApplication,
+		userRepository,
+		notificationRepository,
+		notificationService,
+	)
 
 	commandHandler := telegrambot.NewCommand(rankingApplication, matchApplication, notificationApplication)
 
-	bot := telegrambot.New(commandHandler, telegramToken, debug)
+	notificationJob := job.NewJobNotification(notificationApplication, s)
 
-	bot.Run()
+	notificationJob.Schedule()
+
+	bot.Run(commandHandler)
 
 }

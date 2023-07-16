@@ -8,6 +8,7 @@ import (
 var NotFoundByUser = errors.New("notification not found for this user")
 var CouldNotCreate = errors.New("could not create a new notification")
 var CouldNotUpdate = errors.New("could not update this notification")
+var CouldNotList = errors.New("could not list notifications")
 
 type Repository interface {
 	Create(string, bool, *user.User) (int64, error)
