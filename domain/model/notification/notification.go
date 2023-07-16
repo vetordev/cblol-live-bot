@@ -15,3 +15,5 @@ type Notification struct {
 func New(id int64, schedule time.Time, enable bool, user *user.User) *Notification {
 	return &Notification{id, schedule, enable, user}
 }
+
+const DefaultScheduledTime = "10:00:00"

@@ -37,9 +37,9 @@ func (a *Application) ScheduleDailyNotificationOfMatches() {
 
 func (a *Application) EnableDailyNotificationOfMatches(chatId int64, userName string, scheduledTime string) string {
 
-	scheduledTime, err := notification.ValidateScheduledTime(scheduledTime)
+	scheduledTime = toSchedulingFormat(scheduledTime)
 
-	if err != nil {
+	if scheduledTime == "" {
 		return InvalidScheduledTime
 	}
 

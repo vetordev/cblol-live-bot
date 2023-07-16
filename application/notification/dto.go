@@ -1,19 +1,15 @@
 package notification
 
 import (
-	"errors"
+	"cblol-bot/domain/model/notification"
 	"strings"
 	"time"
 )
 
-var InvalidScheduledTime = errors.New("invalid scheduled time")
-
-const DefaultScheduledTime = "10:00:00"
-
-func ValidateScheduledTime(schedule string) (string, error) {
+func toSchedulingFormat(schedule string) string {
 
 	if schedule == "" {
-		return DefaultScheduledTime, nil
+		return notification.DefaultScheduledTime
 	}
 
 	split := strings.Split(schedule, ":")
@@ -27,8 +23,8 @@ func ValidateScheduledTime(schedule string) (string, error) {
 	}
 
 	if _, err := time.Parse(time.TimeOnly, schedule); err != nil {
-		return "", InvalidScheduledTime
+		return ""
 	}
 
-	return schedule, nil
+	return schedule
 }
