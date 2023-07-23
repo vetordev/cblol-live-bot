@@ -64,7 +64,16 @@ func (r *NotificationRepository) Update(n *notification.Notification) error {
 func (r *NotificationRepository) List() ([]*notification.Notification, error) {
 	var notifications []*notification.Notification
 
-	stmt, err := r.db.Prepare("SELECT * FROM notifications")
+	stmt, err := r.db.Prepare(`
+		SELECT
+			id,
+			schedule_for,
+			enable,
+			user.chat_id,
+			user.name
+		FROM notifications
+		INNER JOIN users ON notifications.user_id = users.chat_id
+	`)
 
 	if err != nil {
 		fmt.Println(err)
@@ -72,6 +81,30 @@ func (r *NotificationRepository) List() ([]*notification.Notification, error) {
 	}
 
 	defer stmt.Close()
+
+	rows, err := stmt.Query()
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return notifications, nil
+		}
+
+		fmt.Println(err)
+		return notifications, err
+	}
+
+	for rows.Next() {
+		var n notification.Notification
+		var u user.User
+
+		var schedule string
+		err = rows.Scan(&n.Id, &schedule, &n.Enable, &u.ChatId, &u.Name)
+
+		n.ScheduledFor, _ = time.Parse(time.TimeOnly, schedule)
+		n.User = &u
+
+		notifications = append(notifications, &n)
+	}
 
 	return notifications, nil
 }
