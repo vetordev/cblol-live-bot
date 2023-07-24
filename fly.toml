@@ -14,3 +14,7 @@ primary_region = "gru"
   LOL_API_KEY="0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"
   LOL_API_LANG="pt-BR"
   DEBUG=false
+
+[mounts]
+  source="cblol_bot_db"
+  destination="/mnt/cblol_bot_db"

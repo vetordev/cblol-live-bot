@@ -7,8 +7,8 @@ import (
 	"log"
 )
 
-func RunMigrations(url string) {
-	m, err := migrate.New("file://infra/database/migration", "sqlite3://"+url)
+func RunMigrations(migrationsPath string, databaseUrl string) {
+	m, err := migrate.New("file://"+migrationsPath, "sqlite3://"+databaseUrl)
 
 	if err != nil {
 		log.Fatal(err)

@@ -62,12 +62,16 @@ func main() {
 		log.Fatal("DATABASE_URL is empty")
 	}
 
+	migrationsPath := os.Getenv("MIGRATIONS_PATH")
+
+	if migrationsPath == "" {
+		log.Fatal("MIGRATIONS_PATH is empaty")
+	}
+
 	bot := telegrambot.New(telegramToken, debug)
 	s := scheduler.New()
-
-	database.RunMigrations(databaseUrl)
-
 	db := database.Connect(databaseUrl)
+
 	userRepository := repository.NewUserRepository(db)
 	notificationRepository := repository.NewNotificationRepository(db)
 
@@ -88,6 +92,6 @@ func main() {
 
 	notificationJob.Schedule()
 
+	database.RunMigrations(migrationsPath, databaseUrl)
 	bot.Run(commandHandler)
-
 }
