@@ -67,10 +67,10 @@ func (r *NotificationRepository) List() ([]*notification.Notification, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT
 			id,
-			schedule_for,
+			scheduled_for,
 			enable,
-			user.chat_id,
-			user.name
+			users.chat_id,
+			users.name
 		FROM notifications
 		INNER JOIN users ON notifications.user_id = users.chat_id
 	`)
