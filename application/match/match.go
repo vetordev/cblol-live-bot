@@ -25,7 +25,7 @@ type Application struct {
 	lang   string
 }
 
-func (a *Application) listSchedulesFromApi() (*DataDto, error) {
+func (a *Application) ListMatchesFromAPI() ([]*match.Match, error) {
 
 	req, err := http.NewRequest(http.MethodGet, ScheduleEndpoint, nil)
 
@@ -43,7 +43,17 @@ func (a *Application) listSchedulesFromApi() (*DataDto, error) {
 
 	resp, err := http.DefaultClient.Do(req)
 
+	if err != nil {
+		return nil, err
+	}
+
 	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
 
 	var scheduleData DataDto
 	err = json.Unmarshal(body, &scheduleData)
@@ -52,113 +62,94 @@ func (a *Application) listSchedulesFromApi() (*DataDto, error) {
 		return nil, err
 	}
 
-	return &scheduleData, nil
+	var matches []*match.Match
+
+	events := scheduleData.Data.Schedule.Events
+
+	location, _ := time.LoadLocation("America/Sao_Paulo")
+
+	for _, event := range events {
+		if event.Type != Match {
+			continue
+		}
+
+		startTime, err := time.Parse(time.RFC3339, event.StartTime)
+		startTime = startTime.In(location)
+
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+
+		var teams []*team.Team
+		var winner *team.Team
+
+		for _, t := range event.Match.Teams {
+			matchTeam := team.New(t.Name, t.Record.Wins, t.Record.Losses)
+			teams = append(teams, matchTeam)
+			if t.Result.Outcome == Win {
+				winner = matchTeam
+			}
+		}
+
+		matchState := match.Unstarted
+		if event.State == Completed {
+			matchState = match.Completed
+		}
+
+		matches = append(matches, match.New(startTime, event.BlockName, matchState, teams[0], teams[1], winner))
+	}
+
+	return matches, nil
+}
+
+func (a *Application) ListTodayMatchesFromAPI() ([]*match.Match, error) {
+	matches, err := a.ListMatchesFromAPI()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var todayMatches []*match.Match
+	today := date.ResetHours(time.Now())
+
+	for _, m := range matches {
+		if date.ResetHours(m.Schedule).Equal(today) {
+			todayMatches = append(todayMatches, m)
+		}
+	}
+
+	return todayMatches, nil
 }
 
 func (a *Application) GetWeekMatches() string {
 
-	var matches []*match.Match
-
-	scheduleData, err := a.listSchedulesFromApi()
+	matches, err := a.ListMatchesFromAPI()
 
 	if err != nil {
 		fmt.Println(err)
 		return CouldNotGetWeekMatches
 	}
 
-	events := scheduleData.Data.Schedule.Events
+	weekService := week.New()
 
-	location, _ := time.LoadLocation("America/Sao_Paulo")
-
-	for _, event := range events {
-		startTime, err := time.Parse(time.RFC3339, event.StartTime)
-		startTime = startTime.In(location)
-
-		if err != nil {
-			fmt.Println(err)
-			return CouldNotGetWeekMatches
-		}
-
-		var teams []*team.Team
-		var winner *team.Team
-
-		for _, t := range event.Match.Teams {
-			matchTeam := team.New(t.Name, t.Record.Wins, t.Record.Losses)
-			teams = append(teams, matchTeam)
-			if t.Result.Outcome == Win {
-				winner = matchTeam
-			}
-		}
-
-		matchState := match.Unstarted
-		if event.State == Completed {
-			matchState = match.Completed
-		}
-
-		matches = append(matches, match.New(&startTime, event.BlockName, matchState, teams[0], teams[1], winner))
-	}
-
-	weekService := week.New(matches)
-
-	return weekService.Matches()
+	return weekService.FormatWeekMatches(matches)
 }
 
 func (a *Application) GetTodayMatches() string {
 
-	var matches []*match.Match
-
-	scheduleData, err := a.listSchedulesFromApi()
+	matches, err := a.ListTodayMatchesFromAPI()
 
 	if err != nil {
 		fmt.Println(err)
-		return CouldNotGetWeekMatches
-	}
-
-	events := scheduleData.Data.Schedule.Events
-
-	location, _ := time.LoadLocation("America/Sao_Paulo")
-
-	today := date.ResetHours(time.Now())
-
-	for _, event := range events {
-		startTime, err := time.Parse(time.RFC3339, event.StartTime)
-		startTime = startTime.In(location)
-
-		if err != nil {
-			fmt.Println(err)
-			return CouldNotGetTodayMatches
-		}
-
-		eventDay := date.ResetHours(startTime)
-
-		if !today.Equal(eventDay) {
-			continue
-		}
-
-		var teams []*team.Team
-		var winner *team.Team
-
-		for _, t := range event.Match.Teams {
-			matchTeam := team.New(t.Name, t.Record.Wins, t.Record.Losses)
-			teams = append(teams, matchTeam)
-			if t.Result.Outcome == Win {
-				winner = matchTeam
-			}
-		}
-
-		matchState := match.Unstarted
-		if event.State == Completed {
-			matchState = match.Completed
-		}
-
-		matches = append(matches, match.New(&startTime, event.BlockName, matchState, teams[0], teams[1], winner))
+		return CouldNotGetTodayMatches
 	}
 
 	if len(matches) == 0 {
 		return NoGames
 	}
 
-	return matchsvc.MatchesPerDay(today, matches)
+	return matchsvc.FormatMatchesPerDay(time.Now(), matches)
 }
 
 func New(apiKey string, lang string) *Application {

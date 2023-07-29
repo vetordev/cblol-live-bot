@@ -3,7 +3,6 @@ package match
 import (
 	"cblol-bot/domain/model/team"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -16,7 +15,7 @@ const (
 )
 
 type Match struct {
-	Schedule *time.Time
+	Schedule time.Time
 	Block    string
 	State    State
 
@@ -28,18 +27,12 @@ type Match struct {
 
 func (m *Match) Format() string {
 
-	hour := m.Schedule.Hour()
-
-	minute := strconv.Itoa(m.Schedule.Minute())
-
-	if len(minute) < 2 {
-		minute = "0" + minute
-	}
+	schedule := m.Schedule.Format("15:04")
 
 	team1ShortName := getShortName(m.Team1.Name)
 	team2ShortName := getShortName(m.Team2.Name)
 
-	s := fmt.Sprintf("<b>%s</b> X <b>%s</b> - %d:%s", team1ShortName, team2ShortName, hour, minute)
+	s := fmt.Sprintf("<b>%s</b> X <b>%s</b> - %s", team1ShortName, team2ShortName, schedule)
 
 	if m.State == Completed {
 		s += fmt.Sprintf(" (%s 🏆)", getShortName(m.Winner.Name))
@@ -61,6 +54,6 @@ func getShortName(name string) string {
 	return shortName
 }
 
-func New(schedule *time.Time, block string, state State, team1 *team.Team, team2 *team.Team, winner *team.Team) *Match {
+func New(schedule time.Time, block string, state State, team1 *team.Team, team2 *team.Team, winner *team.Team) *Match {
 	return &Match{schedule, block, state, team1, team2, winner}
 }

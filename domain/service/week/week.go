@@ -10,11 +10,9 @@ import (
 )
 
 type Week struct {
-	block   string
-	matches []*match.Match
 }
 
-func findBlock(matches []*match.Match) string {
+func (w *Week) findBlock(matches []*match.Match) string {
 
 	now := time.Now()
 	today := date.ResetHours(now)
@@ -22,7 +20,7 @@ func findBlock(matches []*match.Match) string {
 	var blockName string
 
 	for _, m := range matches {
-		matchDay := date.ResetHours(*m.Schedule)
+		matchDay := date.ResetHours(m.Schedule)
 
 		if matchDay.After(today) || matchDay.Equal(today) {
 			blockName = m.Block
@@ -34,7 +32,7 @@ func findBlock(matches []*match.Match) string {
 	return blockName
 }
 
-func filterMatchesByBlock(allMatches []*match.Match, block string) []*match.Match {
+func (w *Week) filterMatchesByBlock(allMatches []*match.Match, block string) []*match.Match {
 	var matches []*match.Match
 
 	for _, m := range allMatches {
@@ -46,31 +44,31 @@ func filterMatchesByBlock(allMatches []*match.Match, block string) []*match.Matc
 	return matches
 }
 
-func (w *Week) Matches() string {
+func (w *Week) FormatWeekMatches(allMatches []*match.Match) string {
+
+	block := w.findBlock(allMatches)
+	weekMatches := w.filterMatchesByBlock(allMatches, block)
 
 	matchDays := make(map[time.Time][]*match.Match)
 
-	for _, m := range w.matches {
-		matchDay := date.ResetHours(*m.Schedule)
+	for _, m := range weekMatches {
+		matchDay := date.ResetHours(m.Schedule)
 
 		matchDays[matchDay] = append(matchDays[matchDay], m)
 	}
 
-	var weekMatches []string
+	var formattedMatches []string
 
 	for day, matches := range matchDays {
-		weekMatches = append(weekMatches, matchsvc.MatchesPerDay(day, matches))
+		formattedMatches = append(formattedMatches, matchsvc.FormatMatchesPerDay(day, matches))
 	}
 
-	formattedWeek := strings.Join(weekMatches, "\n\n")
+	formattedWeek := strings.Join(formattedMatches, "\n\n")
 
-	return fmt.Sprintf("<b>%s</b>\n", w.block) + formattedWeek
+	return fmt.Sprintf("<b>%s</b>\n", block) + formattedWeek
 }
 
-func New(allMatches []*match.Match) *Week {
+func New() *Week {
 
-	block := findBlock(allMatches)
-	weekMatches := filterMatchesByBlock(allMatches, block)
-
-	return &Week{block, weekMatches}
+	return &Week{}
 }
