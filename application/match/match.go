@@ -111,7 +111,9 @@ func (a *Application) ListTodayMatchesFromAPI() ([]*match.Match, error) {
 	}
 
 	var todayMatches []*match.Match
-	today := date.ResetHours(time.Now())
+
+	location, _ := time.LoadLocation("America/Sao_Paulo")
+	today := date.ResetHours(time.Now().In(location))
 
 	for _, m := range matches {
 		if date.ResetHours(m.Schedule).Equal(today) {
