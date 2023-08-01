@@ -34,7 +34,7 @@ func (m *Match) Format() string {
 
 	s := fmt.Sprintf("<b>%s</b> X <b>%s</b> - %s", team1ShortName, team2ShortName, schedule)
 
-	if m.State == Completed {
+	if m.State == Completed && m.Winner != nil {
 		s += fmt.Sprintf(" (%s 🏆)", getShortName(m.Winner.Name))
 	}
 
