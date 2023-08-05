@@ -22,8 +22,10 @@ func (s *Service) ScheduleNotifications(matches []*match.Match, notifications []
 
 		spec := fmt.Sprintf("%d %d %d * * *", n.ScheduledFor.Second(), n.ScheduledFor.Minute(), n.ScheduledFor.Hour())
 
+		chatID := n.User.ChatId
+
 		s.scheduler.Add(spec, func() {
-			s.notifier.Send(n.User.ChatId, text)
+			s.notifier.Send(chatID, text)
 		})
 	}
 
