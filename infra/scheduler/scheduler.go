@@ -12,9 +12,9 @@ type Scheduler struct {
 func (s *Scheduler) RemoveAll() {
 	jobs := s.cron.Entries()
 
-	for key, entry := range jobs {
+	for _, entry := range jobs {
 		// the first cron is responsible for scheduling the notifications, every midnight
-		if key == 0 {
+		if entry.ID == 1 {
 			continue
 		}
 
