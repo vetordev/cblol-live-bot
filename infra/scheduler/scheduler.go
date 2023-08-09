@@ -13,11 +13,6 @@ func (s *Scheduler) RemoveAll() {
 	jobs := s.cron.Entries()
 
 	for _, entry := range jobs {
-		// the first cron is responsible for scheduling the notifications, every midnight
-		if entry.ID == 1 {
-			continue
-		}
-
 		s.cron.Remove(entry.ID)
 	}
 }

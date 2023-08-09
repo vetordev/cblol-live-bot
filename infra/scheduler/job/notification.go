@@ -11,11 +11,15 @@ type ScheduleNotification struct {
 }
 
 func (j *ScheduleNotification) Schedule() {
-	j.scheduler.Add("@midnight", func() {
-		j.scheduler.RemoveAll()
+	j.scheduler.Add("0 * * * * *", j.run)
+}
 
-		j.notificationApplication.ScheduleDailyNotificationOfMatches()
-	})
+func (j *ScheduleNotification) run() {
+	j.scheduler.RemoveAll()
+
+	j.notificationApplication.ScheduleDailyNotificationOfMatches()
+
+	j.Schedule()
 }
 
 func NewJobNotification(notificationApplication *notification.Application, scheduler *scheduler.Scheduler) *ScheduleNotification {
