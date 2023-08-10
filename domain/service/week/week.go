@@ -4,7 +4,6 @@ import (
 	"cblol-bot/domain/model/match"
 	matchsvc "cblol-bot/domain/service/match"
 	"cblol-bot/util/date"
-	"fmt"
 	"strings"
 	"time"
 )
@@ -46,26 +45,34 @@ func (w *Week) filterMatchesByBlock(allMatches []*match.Match, block string) []*
 
 func (w *Week) FormatWeekMatches(allMatches []*match.Match) string {
 
-	block := w.findBlock(allMatches)
-	weekMatches := w.filterMatchesByBlock(allMatches, block)
-
-	matchDays := make(map[time.Time][]*match.Match)
-
-	for _, m := range weekMatches {
-		matchDay := date.ResetHours(m.Schedule)
-
-		matchDays[matchDay] = append(matchDays[matchDay], m)
-	}
-
 	var formattedMatches []string
 
-	for day, matches := range matchDays {
-		formattedMatches = append(formattedMatches, matchsvc.FormatMatchesPerDay(day, matches))
+	location, _ := time.LoadLocation("America/Sao_Paulo")
+	lastMonday := date.LastMonday(time.Now().In(location))
+
+	day := date.ResetHours(lastMonday)
+
+	for {
+
+		var matches []*match.Match
+
+		for _, m := range allMatches {
+			if date.ResetHours(m.Schedule).Equal(day) {
+				matches = append(matches, m)
+			}
+		}
+
+		if len(matches) > 0 {
+			formattedMatches = append(formattedMatches, matchsvc.FormatMatchesPerDay(day, matches))
+		}
+
+		if day.Weekday() == 0 {
+			break
+		}
+		day = day.AddDate(0, 0, 1)
 	}
 
-	formattedWeek := strings.Join(formattedMatches, "\n\n")
-
-	return fmt.Sprintf("<b>%s</b>\n", block) + formattedWeek
+	return strings.Join(formattedMatches, "\n")
 }
 
 func New() *Week {
