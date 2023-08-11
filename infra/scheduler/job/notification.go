@@ -11,7 +11,7 @@ type ScheduleNotification struct {
 }
 
 func (j *ScheduleNotification) Schedule() {
-	j.scheduler.Add("0 * * * * *", j.run)
+	j.scheduler.Add("@midnight", j.run)
 }
 
 func (j *ScheduleNotification) run() {
